@@ -206,6 +206,43 @@ namespace ArcMapAddinVisibility.ViewModels
             if (!GuidPointDictionary.ContainsKey(guid))
                 GuidPointDictionary.Add(guid, point);
         }
+        
+        /// <summary>
+        /// Calculates the zFactor for GCS and PCS spatial references
+        /// </summary>
+        /// <param name="sr">Spatial Reference</param>
+        /// <param name="midLatitude">Degrees Latitude from center/mid point of data, only used for GCS</param>
+        /// <returns></returns>
+        internal double CalculateZFactor(ISpatialReference sr, double midLatitude = 0.0)
+        {
+            double result = 1.0;
+            var zLinearUnit = sr.ZCoordinateUnit;
+            var gcs = sr as IGeographicCoordinateSystem2;
+            var pcs = sr as IProjectedCoordinateSystem5;
+
+            if(gcs != null)
+            {
+                var radians = Math.Abs(midLatitude) * 0.0174533;
+                result = 1 / (111320 * Math.Cos(radians)); // meters in one degree at the equator 111320
+                // adjust calculated zFactor with z unit meters per unit 
+                if(zLinearUnit != null)                                          
+                    result *= zLinearUnit.MetersPerUnit;
+            }
+            else if(pcs != null)
+            {
+                var xyLinearUnit = pcs.CoordinateUnit;
+                result = xyLinearUnit.MetersPerUnit;
+                if (zLinearUnit != null)
+                {
+                    if (zLinearUnit != xyLinearUnit)
+                    {
+                        result = xyLinearUnit.MetersPerUnit / zLinearUnit.MetersPerUnit;
+                    }
+                }
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Method to get a z offset distance in the correct units for the map
@@ -213,28 +250,53 @@ namespace ArcMapAddinVisibility.ViewModels
         /// <param name="map">IMap</param>
         /// <param name="offset">the input offset</param>
         /// <param name="zFactor">ISurface z factor</param>
-        /// <param name="distanceType">the "from" distance unit type</param>
+        /// <param name="distanceFromType">the "from" distance unit type</param>
         /// <returns></returns>
-        internal double GetOffsetInZUnits(IMap map, double offset, double zFactor, DistanceTypes distanceType)
+        //internal double GetOffsetInZUnits(IMap map, double offset, double zFactor, DistanceTypes distanceFromType)
+        //{
+        //    if (map.SpatialReference == null)
+        //        return offset;
+
+        //    double offsetInMapUnits = 0.0;
+        //    DistanceTypes distanceToType = DistanceTypes.Meters; // default to meters
+
+        //    var pcs = map.SpatialReference as IProjectedCoordinateSystem;
+
+        //    if (pcs != null)
+        //    {
+        //        // need to convert the offset from the input distance type to the spatial reference linear type
+        //        // then apply the zFactor
+        //        distanceToType = GetDistanceType(pcs.CoordinateUnit.FactoryCode);
+        //    }
+
+        //    offsetInMapUnits = GetDistanceFromTo(distanceFromType, distanceToType, offset);
+
+        //    var result = offsetInMapUnits / zFactor;
+
+        //    return result;
+        //}
+        /// <summary>
+        /// Method to get a z offset distance in the correct units for the map
+        /// </summary>
+        /// <param name="map">IMap</param>
+        /// <param name="offset">the input offset</param>
+        /// <param name="zFactor">ISurface z factor</param>
+        /// <param name="distanceFromType">the "from" distance unit type</param>
+        /// <returns></returns>
+        internal double GetOffsetInZUnits(IMap map, double offset, double zFactor, DistanceTypes distanceFromType)
         {
             if (map.SpatialReference == null)
                 return offset;
 
-            double offsetInMapUnits = 0.0;
-            DistanceTypes distanceTo = DistanceTypes.Meters; // default to meters
+            // get the Z linear unit from SR, it works for both GCS and PCS
+            var zLinearUnit = map.SpatialReference.ZCoordinateUnit;
 
-            var pcs = map.SpatialReference as IProjectedCoordinateSystem;
+            // convert offset to meters then divide by zcoordinateunit factor
+            // to get offset in z units
+            var result = GetDistanceFromTo(distanceFromType, DistanceTypes.Meters, offset);
 
-            if (pcs != null)
-            {
-                // need to convert the offset from the input distance type to the spatial reference linear type
-                // then apply the zFactor
-                distanceTo = GetDistanceType(pcs.CoordinateUnit.FactoryCode);
-            }
-
-            offsetInMapUnits = GetDistanceFromTo(distanceType, distanceTo, offset);
-
-            var result = offsetInMapUnits / zFactor;
+            if(zLinearUnit != null)
+                result /= zLinearUnit.MetersPerUnit;
 
             return result;
         }

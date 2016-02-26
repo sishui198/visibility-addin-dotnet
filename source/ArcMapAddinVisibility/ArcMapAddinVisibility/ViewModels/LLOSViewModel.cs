@@ -208,6 +208,8 @@ namespace ArcMapAddinVisibility.ViewModels
                         //TODO handle void z
                         continue;
                     }
+
+                    //SetZFactor(surface, observerPoint, targetPoint);
                     
                     geoBridge.GetLineOfSight(surface,
                         new PointClass() { Z = z1, X = observerPoint.X, Y = observerPoint.Y, ZAware = true },
@@ -229,6 +231,36 @@ namespace ArcMapAddinVisibility.ViewModels
                     }
                 }
             }
+        }
+
+        private void SetZFactor(ISurface surface, IPoint observerPoint, IPoint targetPoint)
+        {
+            if (surface == null || observerPoint == null || targetPoint == null)
+                return;
+
+            double midLatitude = 0.0;
+            if (ArcMap.Document.FocusMap.SpatialReference is IGeographicCoordinateSystem2)
+            {
+                var construct = new Polyline() as IConstructGeodetic;
+
+                if (construct == null)
+                    return;
+
+                // if you don't use the activator, you will get exceptions
+                Type srType = Type.GetTypeFromProgID("esriGeometry.SpatialReferenceEnvironment");
+                var srf3 = Activator.CreateInstance(srType) as ISpatialReferenceFactory3;
+
+                var linearUnit = srf3.CreateUnit((int)esriSRUnitType.esriSRUnit_Meter) as ILinearUnit;
+
+                construct.ConstructGeodeticLineFromPoints(esriGeodeticType.esriGeodeticTypeGeodesic, observerPoint, targetPoint, linearUnit, esriCurveDensifyMethod.esriCurveDensifyByDeviation, -1.0);
+
+                var polyline = construct as IPolyline;
+                IPoint midPoint = new PointClass();
+                polyline.QueryPoint(esriSegmentExtension.esriNoExtension, 0.5, true, midPoint);
+                midLatitude = midPoint.Y;
+            }
+
+            surface.ZFactor = CalculateZFactor(ArcMap.Document.FocusMap.SpatialReference, midLatitude);
         }
     }
 }

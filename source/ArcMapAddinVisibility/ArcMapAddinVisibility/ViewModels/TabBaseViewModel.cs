@@ -671,7 +671,7 @@ namespace ArcMapAddinVisibility.ViewModels
         /// Adds a graphic element to the map graphics container
         /// </summary>
         /// <param name="geom">IGeometry</param>
-        internal string AddGraphicToMap(IGeometry geom, IColor color, bool IsTempGraphic = false, esriSimpleMarkerStyle markerStyle = esriSimpleMarkerStyle.esriSMSCircle, int size = 5)
+        internal string AddGraphicToMap(IGeometry geom, IColor color, bool IsTempGraphic = false, esriSimpleMarkerStyle markerStyle = esriSimpleMarkerStyle.esriSMSCircle, int size = 6)
         {
             if (geom == null || ArcMap.Document == null || ArcMap.Document.FocusMap == null)
                 return string.Empty;
@@ -687,7 +687,7 @@ namespace ArcMapAddinVisibility.ViewModels
                 var simpleMarkerSymbol = new SimpleMarkerSymbol() as ISimpleMarkerSymbol;
                 simpleMarkerSymbol.Color = color;
                 simpleMarkerSymbol.Outline = true;
-                simpleMarkerSymbol.OutlineColor = color;
+                simpleMarkerSymbol.OutlineColor = new RgbColorClass();
                 simpleMarkerSymbol.Size = size;
                 simpleMarkerSymbol.Style = markerStyle;
 

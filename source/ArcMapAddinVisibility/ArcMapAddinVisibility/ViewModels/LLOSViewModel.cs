@@ -250,7 +250,7 @@ namespace ArcMapAddinVisibility.ViewModels
                 // visualize observer
 
                 // add blue dot
-                AddGraphicToMap(observerPoint, new RgbColorClass() { Blue = 255 }, size: 10);
+                AddGraphicToMap(observerPoint, new RgbColorClass() { Blue = 255 }, size: 12);
                                 
                 if(CanSeeAtLeastOneTarget)
                 {
@@ -275,14 +275,14 @@ namespace ArcMapAddinVisibility.ViewModels
                 if (dict.ContainsKey(targetPoint))
                 {
                     // add green circle
-                    AddGraphicToMap(targetPoint, new RgbColorClass() { Green = 255 }, size: 10);
+                    AddGraphicToMap(targetPoint, new RgbColorClass() { Green = 255 }, size: 14);
                     // add label
                     AddTextToMap(dict[targetPoint].ToString(), targetPoint, new RgbColorClass(), size: 10);
                 }
                 else
                 {
                     // add red circle
-                    AddGraphicToMap(targetPoint, new RgbColorClass() { Red = 255 }, size: 10);
+                    AddGraphicToMap(targetPoint, new RgbColorClass() { Red = 255 }, size: 12);
                 }
             }
         }

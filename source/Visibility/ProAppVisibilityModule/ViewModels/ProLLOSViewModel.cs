@@ -167,12 +167,14 @@ namespace ProAppVisibilityModule.ViewModels
 
             var point = obj as MapPoint;
 
-            if (point == null || !IsValidPoint(point).Result)
+            if (point == null || !(await IsValidPoint(point)))
                 return;
 
             if (ToolMode == MapPointToolMode.Target)
             {
+
                 var guid = await AddGraphicToMap(point, ColorFactory.Red, true, 5.0, markerStyle: SimpleMarkerStyle.Square);
+                var txt = await AddGraphicToMap(point, ColorFactory.Black, true, 5.0, text: "1");
                 var addInPoint = new AddInPoint() { Point = point, GUID = guid };
                 Application.Current.Dispatcher.Invoke(() =>
                     {

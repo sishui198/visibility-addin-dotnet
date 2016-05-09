@@ -465,7 +465,10 @@ namespace ProAppVisibilityModule.ViewModels
                 await QueuedTask.Run(() =>
                 {
                     // TODO add text graphic
-                    //var tg = new CIMTextGraphic() { Placement = Anchor.CenterPoint, Text = text};
+                    //var tg = new CIMTextGraphic() { Placement = Anchor.CenterPoint, Text = text, Shape = geom};
+                    var s = SymbolFactory.ConstructTextSymbol();
+                    symbol = s.MakeSymbolReference();
+
                 });
             }
             else if (geom.GeometryType == GeometryType.Point)

@@ -424,8 +424,8 @@ namespace ProAppVisibilityModule.ViewModels
                                     {
                                         // Either the field index or the field name can be used in the indexer.
                                         // project the point here or the buffer tool may use an angular unit and run forever
-                                        var point = GeometryEngine.Project(observer.Point, surfaceSR);
-                                        var polygon = GeometryEngine.Buffer(point, bufferDistance);
+                                        var point = GeometryEngine.Instance.Project(observer.Point, surfaceSR);
+                                        var polygon = GeometryEngine.Instance.Buffer(point, bufferDistance);
                                         rowBuffer[shapeFieldName] = polygon;
 
                                         using (var feature = enterpriseFeatureClass.CreateRow(rowBuffer))

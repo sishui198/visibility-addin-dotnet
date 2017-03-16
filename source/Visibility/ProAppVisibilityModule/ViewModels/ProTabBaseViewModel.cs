@@ -73,12 +73,12 @@ namespace ProAppVisibilityModule.ViewModels
 
                 // re-add graphic to map overlay
                 SimpleMarkerStyle ms = SimpleMarkerStyle.Circle;
-                CIMColor color = ColorFactory.BlueRGB;
+                CIMColor color = ColorFactory.Instance.BlueRGB;
 
                 if (item.Tag == "target")
                 {
                     ms = SimpleMarkerStyle.Square;
-                    color = ColorFactory.RedRGB;
+                    color = ColorFactory.Instance.RedRGB;
                 }
                 addList.Add(new tempProGraphic()
                 {
@@ -567,7 +567,7 @@ namespace ProAppVisibilityModule.ViewModels
         internal async Task<string> AddGraphicToMap(Geometry geom, bool IsTempGraphic = false, double size = 1.0)
         {
             // default color Red
-            return await AddGraphicToMap(geom, ColorFactory.RedRGB, IsTempGraphic, size);
+            return await AddGraphicToMap(geom, ColorFactory.Instance.RedRGB, IsTempGraphic, size);
         }
 
         internal async Task<string> AddGraphicToMap(Geometry geom, CIMColor color, bool IsTempGraphic = false, double size = 1.0, string text = "", SimpleMarkerStyle markerStyle = SimpleMarkerStyle.Circle, string tag = "")
@@ -589,7 +589,7 @@ namespace ProAppVisibilityModule.ViewModels
             {
                 await QueuedTask.Run(() =>
                 {
-                    var s = SymbolFactory.ConstructPointSymbol(color, size, markerStyle);
+                    var s = SymbolFactory.Instance.ConstructPointSymbol(color, size, markerStyle);
                     symbol = new CIMSymbolReference() { Symbol = s };
                 });
             }
@@ -597,7 +597,7 @@ namespace ProAppVisibilityModule.ViewModels
             {
                 await QueuedTask.Run(() =>
                 {
-                    var s = SymbolFactory.ConstructLineSymbol(color, size);
+                    var s = SymbolFactory.Instance.ConstructLineSymbol(color, size);
                     symbol = new CIMSymbolReference() { Symbol = s };
                 });
             }
@@ -605,8 +605,8 @@ namespace ProAppVisibilityModule.ViewModels
             {
                 await QueuedTask.Run(() =>
                 {
-                    var outline = SymbolFactory.ConstructStroke(ColorFactory.BlackRGB, 1.0, SimpleLineStyle.Solid);
-                    var s = SymbolFactory.ConstructPolygonSymbol(color, SimpleFillStyle.Solid, outline);
+                    var outline = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.BlackRGB, 1.0, SimpleLineStyle.Solid);
+                    var s = SymbolFactory.Instance.ConstructPolygonSymbol(color, SimpleFillStyle.Solid, outline);
                     symbol = new CIMSymbolReference() { Symbol = s };
                 });
             }
